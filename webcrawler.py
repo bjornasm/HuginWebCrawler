@@ -18,7 +18,6 @@ def crawler(url):
 
 			# Another check, this is if we deal with a local link on the form /no/personvern/feed/
 			elif new_url.startswith('/'):
-
 				# To better store local links, f.ex /no/personvern/feed/ forward slash (/) is omitted
 				new_url = re.sub('\/*$', '', new_url)
 				url = re.sub('\/*$', '', url)
@@ -85,8 +84,17 @@ if __name__ == "__main__":
 	  		# An extra check if the url is already crawled, if not we crawl this url
 	  		if urlsToCrawl_Parent[0] in urls_Crawled:
 	  			urlsToCrawl_Parent.pop(0)
-	  		else:
-                                crawler(urlsToCrawl_Parent[0])
+	  		elif ('http://' in urlsToCrawl_Parent[0] or 'https://' in urlsToCrawl_Parent[0]):
+					try:
+					 	crawler(urlsToCrawl_Parent[0])
+					except:
+			 			urlsToCrawl_Parent.pop(0) 
+			else:
+				urlsToCrawl_Parent[0] = "http://"+urlsToCrawl_Parent[0]
+				try:
+				 	crawler(urlsToCrawl_Parent[0])
+			 	except:
+				 	urlsToCrawl_Parent.pop(0)
 
 	  	# When we are done with all the URLs in the parent list, we add the first URL in the children list
 	 	urlsToCrawl_Parent.append(urlsToCrawl_Child[0])

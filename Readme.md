@@ -8,6 +8,8 @@ __Assumptions__:
 
 * I can use python libraries
 
+* I can not use pre-made web-crawling frameworks
+
 * I do not need to store the actual website pages on disk, the key point is to gather URLs
 
 * Because of the time limit i have taken the freedom of not implementing local storage of the URL queue (see first point under 'Limitations of the task')

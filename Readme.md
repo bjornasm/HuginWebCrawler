@@ -12,9 +12,9 @@ __Assumptions__:
 
 * Because of the time limit i have taken the freedom of not implementing local storage of the URL queue (see first point under 'Limitations of the task')
 
+* A minimal webcrawler means that using simple files to save the state is OK.
+
 __Limitations__:
-	
-* The crawler will not be able to assume operation if shut down. Because the time limit of this task i omitted this point, even though it easily can be implemented. The easiest would be to writing the URL lists to a file on disk. This would on a other hand require many read/write operations, and could make this code slower for this demonstration. To make this a bit faster i could save the crawled URLs and the crawl queues every time the a domain has been crawled (i.e when the parent URL queue has been emptied). 
 	
 * The crawler are limited to the file endings and the domains in the allowed list, it can be run without a allowed list, but then it could be using bandwith to load pictures and other files on the server not relevant for web crawling.
 	
@@ -23,8 +23,6 @@ __Limitations__:
 __Future improvements__:
 
 * __Scaling of the crawler__ I would implement a better work distributor that could distribute the URL queue dynamically to different crawlers on different machines/nodes. I would distibrute the unique domains (http://telenor.com, http://ap.no etc), so every crawler would only crawl one domain at the time, as well as submit all the children URLs (i.e URL for other domains) back to the distributor for distribution.
-
-* __Saving the URL queue__ to a file or to a database so it can resume if shut down, and so that the work can be viewed while running, see first point under limitations.
 
 * Utilizing a selection policy, f.ex a point system for the domains to prioritize the crawling.
 

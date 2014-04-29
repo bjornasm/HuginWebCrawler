@@ -1,5 +1,6 @@
 import urllib
 import re
+import os
 
 # The parameter is the url the crawler is gonna crawl.
 def crawler(url):
@@ -34,39 +35,50 @@ def crawler(url):
 	urlsToCrawl_Parent.pop(0)
 	urls_Crawled.append(url)
 
-# Here we write the list over urls crawled to a txt file
-def writetofile(urls):
+	# A fast implemention of a "blind" saving of state so the program can be resumed after an error
+	writetofile(urls_Crawled, 'URLsCrawled')
+	writetofile(urlsToCrawl_Parent, 'parentURLs')
+	writetofile(urlsToCrawl_Child, 'childURLs')
 
-	with open('CrawledURLs.txt','w') as file:
+# Here we write the list over urls crawled to a txt file
+def writetofile(urls, filename):
+
+	with open(filename,'w') as file:
 		for item in urls:
 		    print>>file, item
 
 if __name__ == "__main__":
 
-	# This is the 'input' parameteres - the depth parameter indicates how deep the crawler gets, i.e how many different websites
-	# it visits, while the max_url gives how many different url it's gonna crawl. This is implemented to give a better control of
-	# the runtime of this crawler.
+	# This is the 'input' parameteres the max_url gives how many different url it's gonna crawl. 
+	# this is implemented to give a better control of the runtime of this crawler.
 	starturl = "http://www.telenor.com"
-	depth = 3
 	max_urls = 100
 
-	# This is simple lists to hold the urls crawled, the parent urls, i.e the 'local' urls on the current page, while the 
-	# child urls are urls for other web pages found on a parent page.
+	if not os.path.exists('parentURLs') or not os.path.getsize('parentURLs') > 0 or not os.path.exists('childURLs') or not os.path.getsize('childURLs') > 0:
+		
+		# This is simple lists to hold the urls crawled, the parent urls, i.e the 'local' urls on the current page, while the 
+		# child urls are urls for other web pages found on a parent page.
+		urls_Crawled = []
+		urlsToCrawl_Parent = []
+		urlsToCrawl_Child = []
 
-	urls_Crawled = []
-	urlsToCrawl_Parent = []
-	urlsToCrawl_Child = []
+		# We start to append the starturl
+		urlsToCrawl_Parent.append(starturl)
+
+	else:
+		with open('URLsCrawled', 'r') as f:
+		    urls_Crawled = [line.rstrip('\n') for line in f]
+		with open('parentURLs', 'r') as f:
+		    urlsToCrawl_Parent = [line.rstrip('\n') for line in f]
+		with open('childURLs', 'r') as f:
+		    urlsToCrawl_Child = [line.rstrip('\n') for line in f]
 
 	# To avoid crawl links to pictures (.jpeg) and other files i have made an list over allowed url-endings.
 	allowedList = ['html', 'htm', 'php', 'jsp', 'jspx', 'asp', 'no', 'com', 'net', 'org', 'se', 'dk']
 
-	# We start to append the starturl
-	urlsToCrawl_Parent.append(starturl)
-
 	# A while loop is utilized so we crawl the next url in the list until we have sucessfully crawled the amount of 
 	# URLs wanted, or until we have reached the depth specified.
-	d = 0
-	while (d<=depth) and (len(urls_Crawled) < max_urls):
+	while (len(urls_Crawled) < max_urls):
 	  	
 	  	# A while loop is utilized to always crawl the parent URLs first
 	  	while urlsToCrawl_Parent and (len(urls_Crawled) < max_urls):
@@ -81,6 +93,5 @@ if __name__ == "__main__":
 	 	urlsToCrawl_Parent.append(urlsToCrawl_Child[0])
 	 	urlsToCrawl_Child.pop(0)
 
-	 	d += 1
-
-	writetofile(urls_Crawled)
+	os.remove('childURLs')
+	os.remove('parentURLs')

@@ -4,13 +4,12 @@ import os
 
 # The parameter is the url the crawler is gonna crawl.
 def crawler(url):
-
 	# The crawler find links by utilizing pythons urllib and the href tag
 	for new_url in re.findall('''href=["'](.[^"']+)["']''', urllib.urlopen(url).read()): 
         	new_url = re.sub('\/*$', '', new_url)
 
 		# A bit ugly, but this is to be sure that the new url is not in the urls already crawled, or scheduled for crawling, a check for if it's a HTML element that have escape the regex, or a "link" to a html class on the same page, and that the url ending is in the allowed list
-		if not any(new_url in word for word in urls_Crawled) and not any(new_url in word for word in urlsToCrawl_Parent)and not any(new_url in word for word in urlsToCrawl_Child) and '<' not in new_url and '#' not in new_url and any(word in new_url.split('.')[-1] for word in allowedList):
+		if not any(new_url in word for word in urls_Crawled) and not any(new_url in word for word in urlsToCrawl_Parent)and not any(new_url in word for word in urlsToCrawl_Child) and '<' not in new_url and '#' not in new_url and any(word in new_url.split('.')[-1] for word in allowedList) and 'https://wow' not in new_url:
 			
 			# If the url is in the new url, f.ex http://www.telenor.com is inside http://www.telenor.com/no/personvern/feed
 			# the latter should be appended in the parent list as i prioritize the local urls first.
@@ -52,7 +51,7 @@ if __name__ == "__main__":
 	# This is the 'input' parameteres the max_url gives how many different url it's gonna crawl. 
 	# this is implemented to give a better control of the runtime of this crawler.
 	starturl = "http://www.telenor.com"
-	max_urls = 50
+	max_urls = 50000
 
 	if not os.path.exists('parentURLs') or not os.path.getsize('parentURLs') > 0 or not os.path.exists('childURLs') or not os.path.getsize('childURLs') > 0:
 		

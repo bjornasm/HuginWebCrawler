@@ -24,6 +24,8 @@ __Future improvements__:
 
 * __Scaling of the crawler__ I would implement a better work distributor that could distribute the URL queue dynamically to different crawlers on different machines/nodes. I would distibrute the unique domains (http://telenor.com, http://ap.no etc), so every crawler would only crawl one domain at the time, as well as submit all the children URLs (i.e URL for other domains) back to the distributor for distribution.
 
+* A different way of saving progress than saving the crawl-lists to files or a better management of the writing operations (threading)
+
 * Utilizing a selection policy, f.ex a point system for the domains to prioritize the crawling.
 
 * Saving the date of the last time a website was crawled so we could implement a re-visiting policy based on this.

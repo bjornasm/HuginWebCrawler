@@ -49,8 +49,8 @@ if __name__ == "__main__":
 
 	# This is the 'input' parameteres the max_url gives how many different url it's gonna crawl. 
 	# this is implemented to give a better control of the runtime of this crawler.
-	starturl = ""
-	max_urls = 500
+	starturl = "http://www.telenor.com"
+	max_urls = 50000
 
 	if not os.path.exists('parentURLs') or not os.path.getsize('parentURLs') > 0 or not os.path.exists('childURLs') or not os.path.getsize('childURLs') > 0:
 		

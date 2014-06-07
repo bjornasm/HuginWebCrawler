@@ -1,10 +1,14 @@
+from bs4 import BeautifulSoup
 import httplib
 import urlparse
 import urllib2
 
+def saveState():
+    #Lagre til fil
+
 def get_server_status_code(link):
     # http://stackoverflow.com/questions/1140661
-    host, path = urlparse.urlparse(link)[1:3]    # elems [1] and [2] hmmm hva er dette
+    host, path = urlparse.urlparse(link)[1:3]
     try:
         conn = httplib.HTTPConnection(host)
         conn.request('HEAD', path)
@@ -21,8 +25,11 @@ def fetch_webpage(url):
 	webpage = urllib2.urlopen(url)
 	return webpage
 
-def fetch_links(page):
-	#fetch all the links on the webpage
+def fetch_links(webpage):
+	html = webpage.read()
+    soup = BeautifulSoup(html)
+    links = soup.find_all("a")
+    return links
 
 def schedule_link(link):
 	if valid_link(link):
@@ -42,3 +49,7 @@ def crawl(url):
         if havent_visited(link):
               schedule_link(link)
 
+if __name__ == "__main__":
+    urls_Crawled = []
+    urlsToCrawl_Parent = []
+    urlsToCrawl_Child = []

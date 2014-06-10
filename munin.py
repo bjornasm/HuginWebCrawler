@@ -3,6 +3,11 @@ import httplib
 import urlparse
 import urllib2
 
+def parent_link(link):
+    #Check if parent or child - how? What defines a parent?
+    #A parent link is at the same domain as the main link, so i just need to strip it for everything before and after domain.no
+    #and check if that matches the stripped links in urlsToCrawl_Parent
+
 def saveState():
     #Lagre til fil
 
@@ -34,13 +39,16 @@ def fetch_links(webpage):
 def schedule_link(link):
 	if valid_link(link):
 		if parent_link(link):
-			#Schedule parent
+			urlsToCrawl_Parent.append(link)
 		else:
-			#Schedule child
+			urlsToCrawl_Child.append(link)
 		#Puts the links in the queue
 
 def havent_visited(link):
-	#Search algorithm to check set of visited
+	if link in urlsToCrawl_Parent or link in urlsToCrawl_Child:
+        return false
+    else:
+        return true
 
 def crawl(url):
     webpage = fetch_webpage(url)
@@ -53,3 +61,6 @@ if __name__ == "__main__":
     urls_Crawled = []
     urlsToCrawl_Parent = []
     urlsToCrawl_Child = []
+
+    #Add a method to read from file if exist.
+    #Add a method to traverse and start the call.

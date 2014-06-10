@@ -7,6 +7,8 @@ def parent_link(link):
     #Check if parent or child - how? What defines a parent?
     #A parent link is at the same domain as the main link, so i just need to strip it for everything before and after domain.no
     #and check if that matches the stripped links in urlsToCrawl_Parent
+    hostname = urlparse.urlparse(link).hostname
+    return hostname in urlsToCrawl_Parent[0]
 
 def saveState():
     #Lagre til fil
@@ -21,7 +23,7 @@ def get_server_status_code(link):
     except StandardError:
         return None
  
-def valid_link(link):
+def is_valid_link(link):
 	# http://stackoverflow.com/questions/2924422
     good_codes = [httplib.OK, httplib.FOUND, httplib.MOVED_PERMANENTLY]
     return get_server_status_code(link) in good_codes
@@ -37,7 +39,7 @@ def fetch_links(webpage):
     return links
 
 def schedule_link(link):
-	if valid_link(link):
+	if is_valid_link(link):
 		if parent_link(link):
 			urlsToCrawl_Parent.append(link)
 		else:

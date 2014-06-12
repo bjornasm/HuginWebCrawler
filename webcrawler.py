@@ -49,8 +49,8 @@ if __name__ == "__main__":
 
 	# This is the 'input' parameteres the max_url gives how many different url it's gonna crawl. 
 	# this is implemented to give a better control of the runtime of this crawler.
-	starturl = "http://www.telenor.com"
-	max_urls = 50000
+	starturl = "http://www.telenor.no"
+	max_urls = 5
 
 	if not os.path.exists('parentURLs') or not os.path.getsize('parentURLs') > 0 or not os.path.exists('childURLs') or not os.path.getsize('childURLs') > 0:
 		
@@ -99,6 +99,7 @@ if __name__ == "__main__":
 	  	# When we are done with all the URLs in the parent list, we add the first URL in the children list
 	 	urlsToCrawl_Parent.append(urlsToCrawl_Child[0])
 	 	urlsToCrawl_Child.pop(0)
+	 	print len(urlsToCrawl_Parent) + len(urlsToCrawl_Child) + len(urls_Crawled)
 
 	os.remove('childURLs')
 	os.remove('parentURLs')

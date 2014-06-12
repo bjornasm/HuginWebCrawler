@@ -2,15 +2,37 @@ from bs4 import BeautifulSoup
 import httplib
 import urlparse
 import urllib2
+import time
 
-def parent_link(link):
+def statecheck():
+    print "Parent"
+    print urlsToCrawl_Parent
+    print "Child"
+    print urlsToCrawl_Child
+    print "Crawled"
+    print urls_Crawled
+
+def sanitize(url, parent):
+    if is_internal_link(url):
+        if parent.endswith("/") or url.startswith("/"):
+            return parent + url
+        else:
+            return parent + "/" + url
+    return url
+
+def is_internal_link(url):
+    if url.startswith("http"):
+        return False
+    return True
+
+def hostname(link):
     #Check if parent or child - how? What defines a parent?
     #A parent link is at the same domain as the main link, so i just need to strip it for everything before and after domain.no
     #and check if that matches the stripped links in urlsToCrawl_Parent
     hostname = urlparse.urlparse(link).hostname
-    return hostname in urlsToCrawl_Parent[0]
+    return hostname
 
-def saveState():
+#def saveState():
     #Lagre til fil
 
 def get_server_status_code(link):
@@ -24,6 +46,7 @@ def get_server_status_code(link):
         return None
  
 def is_valid_link(link):
+    link = sanitize(link, hostname(urlsToCrawl_Parent[0]))
 	# http://stackoverflow.com/questions/2924422
     good_codes = [httplib.OK, httplib.FOUND, httplib.MOVED_PERMANENTLY]
     return get_server_status_code(link) in good_codes
@@ -33,31 +56,33 @@ def fetch_webpage(url):
 	return webpage
 
 def fetch_links(webpage):
-	html = webpage.read()
+    html = webpage.read()
     soup = BeautifulSoup(html)
-    links = soup.find_all("a")
+    links = soup.find_all("a", href=True)
     return links
 
 def schedule_link(link):
-	if is_valid_link(link):
-		if parent_link(link):
-			urlsToCrawl_Parent.append(link)
-		else:
-			urlsToCrawl_Child.append(link)
-		#Puts the links in the queue
+    if is_valid_link(link):    
+        if hostname(link) in urlsToCrawl_Parent[0]:
+            urlsToCrawl_Parent.append(link)
+        else:
+            urlsToCrawl_Child.append(link)
+            #Puts the links in the queue
 
 def havent_visited(link):
-	if link in urlsToCrawl_Parent or link in urlsToCrawl_Child:
-        return false
+    if link not in urls_Crawled or link not in urlsToCrawl_Parent or link not in urlsToCrawl_Child:
+        return True
     else:
-        return true
+        return False
 
 def crawl(url):
     webpage = fetch_webpage(url)
     links = fetch_links(webpage)
     for link in links:
+        link = link['href'] #This is not done on a good way at all, should clearly do this in fetch_links?
+        print link
         if havent_visited(link):
-              schedule_link(link)
+            schedule_link(link)
 
 if __name__ == "__main__":
     urls_Crawled = []
@@ -65,4 +90,18 @@ if __name__ == "__main__":
     urlsToCrawl_Child = []
 
     #Add a method to read from file if exist.
-    #Add a method to traverse and start the call.
+    urlsToCrawl_Parent.append("http://www.telenor.no/")
+    while (len(urls_Crawled) < 5):
+        if (len(urlsToCrawl_Parent) > 0):
+            crawl(urlsToCrawl_Parent[0])
+            urls_Crawled.append(urlsToCrawl_Parent[0])
+            urlsToCrawl_Parent.pop(0)
+
+        elif (len(urlsToCrawl_Child) > 0):
+            urlsToCrawl_Parent.append(urlsToCrawl_Child[0])
+            crawl(urlsToCrawl_Parent[0])
+            urls_Crawled.append(urlsToCrawl_Parent[0])
+            urlsToCrawl_Parent.pop(0)
+        #Add a method to traverse and start the call.
+    statecheck()
+    print len(urlsToCrawl_Parent) + len(urlsToCrawl_Child) + len(urls_Crawled)

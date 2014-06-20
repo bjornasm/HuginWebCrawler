@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import httplib
 import urlparse
-import urllib2
+import urllib
 import time
 
 import cProfile
@@ -15,16 +15,13 @@ def sanitize(url, parent):
     return url
 
 def is_internal_link(url):
-    if url.startswith("http"):
-        return False
-    return True
+    return not url.startswith("http")
 
 def hostname(link):
     #Check if parent or child - how? What defines a parent?
     #A parent link is at the same domain as the main link, so i just need to strip it for everything before and after domain.no
     #and check if that matches the stripped links in urlsToCrawl_Parent
-    hostname = urlparse.urlparse(link).hostname
-    return hostname
+    return urlparse.urlparse(link).hostname
 
 #def saveState():
     #Lagre til fil
@@ -46,12 +43,11 @@ def is_valid_link(link):
     return get_server_status_code(link) in good_codes
 
 def fetch_webpage(url):
-	webpage = urllib2.urlopen(url)
+	webpage = urllib.urlopen(url).read()
 	return webpage
 
 def fetch_links(webpage):
-    html = webpage.read()
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(webpage)
     links = soup.find_all("a", href=True)
     return links
 
@@ -77,6 +73,11 @@ def crawl(url):
         if havent_visited(link):
             schedule_link(link)
 
+def prepareCrawl():
+    target = urlsToCrawl_Parent.pop(0)
+    crawl(target)
+    urls_Crawled.append(target)
+
 if __name__ == "__main__":
 #def main():
     urls_Crawled = []
@@ -87,15 +88,12 @@ if __name__ == "__main__":
     urlsToCrawl_Parent.append("http://www.telenor.no/")
     while (len(urls_Crawled) < 5):
         if (len(urlsToCrawl_Parent) > 0):
-            crawl(urlsToCrawl_Parent[0])
-            urls_Crawled.append(urlsToCrawl_Parent[0])
-            urlsToCrawl_Parent.pop(0)
+            prepareCrawl()
 
         elif (len(urlsToCrawl_Child) > 0):
             urlsToCrawl_Parent.append(urlsToCrawl_Child[0])
-            crawl(urlsToCrawl_Parent[0])
-            urls_Crawled.append(urlsToCrawl_Parent[0])
-            urlsToCrawl_Parent.pop(0)
+            prepareCrawl()
+
         #Add a method to traverse and start the call.
     print len(urlsToCrawl_Parent) + len(urlsToCrawl_Child) + len(urls_Crawled)
 
